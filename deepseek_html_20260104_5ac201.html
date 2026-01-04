@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: #2d3436;
+            color: white;
+            text-align: center;
+            padding: 25px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #dfe6e9;
+            font-size: 1.1rem;
+        }
+        
+        .timer-container {
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .timer-display {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            box-shadow: 20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .timer-progress {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(#ff6b6b 0deg, transparent 0deg);
+            transition: all 1s linear;
+        }
+        
+        .timer-text {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        
+        .time {
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: #2d3436;
+            line-height: 1;
+        }
+        
+        .timer-label {
+            font-size: 1.5rem;
+            color: #636e72;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: #ff6b6b;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #ff5252;
+            transform: translateY(-3px);
+        }
+        
+        .btn-secondary {
+            background-color: #dfe6e9;
+            color: #2d3436;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #b2bec3;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .settings {
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .settings h3 {
+            color: #2d3436;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        
+        .time-controls {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .time-set {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .time-set label {
+            display: block;
+            margin-bottom: 8px;
+            color: #636e72;
+            font-weight: 600;
+        }
+        
+        .time-input {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 10px;
+            padding: 5px 15px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .time-input button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #ff6b6b;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .time-input button:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .time-input span {
+            flex: 1;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3436;
+        }
+        
+        .session-counter {
+            margin-top: 30px;
+            text-align: center;
+            color: #636e72;
+            font-size: 1.2rem;
+        }
+        
+        .session-counter span {
+            color: #ff6b6b;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        footer {
+            padding: 20px;
+            text-align: center;
+            color: #636e72;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 600px) {
+            .timer-display {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .time {
+                font-size: 3.5rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .time-controls {
+                flex-direction: column;
+            }
+        }
+        
+        .pomodoro-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f4fd;
+            border-radius: 10px;
+            border-left: 4px solid #4ecdc4;
+        }
+        
+        .pomodoro-info h4 {
+            color: #2d3436;
+            margin-bottom: 8px;
+        }
+        
+        .pomodoro-info p {
+            color: #636e72;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-clock"></i> Pomodoro Timer</h1>
+            <p class="subtitle">Сосредоточьтесь на работе, делайте перерывы, повышайте продуктивность</p>
+        </header>
+        
+        <main class="timer-container">
+            <div class="timer-display">
+                <div class="timer-progress" id="progress"></div>
+                <div class="timer-text">
+                    <div class="time" id="time">25:00</div>
+                    <div class="timer-label" id="timer-label">Рабочее время</div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-primary" id="startBtn">
+                    <i class="fas fa-play"></i> Старт
+                </button>
+                <button class="btn btn-secondary" id="pauseBtn" disabled>
+                    <i class="fas fa-pause"></i> Пауза
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fas fa-redo"></i> Сброс
+                </button>
+            </div>
+            
+            <div class="settings">
+                <h3>Настройки таймера</h3>
+                <div class="time-controls">
+                    <div class="time-set">
+                        <label>Рабочее время (минуты)</label>
+                        <div class="time-input">
+                            <button id="workMinus">-</button>
+                            <span id="workTime">25</span>
+                            <button id="workPlus">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="time-set">
+                        <label>Перерыв (минуты)</label>
+                        <div class="time-input">
+                            <button id="breakMinus">-</button>
+                            <span id="breakTime">5</span>
+                            <button id="breakPlus">+</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="session-counter">
+                    Завершено сессий: <span id="sessionCount">0</span>
+                </div>
+            </div>
+            
+            <div class="pomodoro-info">
+                <h4>Что такое Pomodoro техника?</h4>
+                <p>Метод Pomodoro — это техника управления временем, которая разбивает работу на интервалы (обычно 25 минут), разделенные короткими перерывами. После 4 рабочих сессий рекомендуется делать более длительный перерыв (15-30 минут).</p>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Pomodoro Timer © 2023 | Сделайте вашу работу более продуктивной</p>
+        </footer>
+    </div>
+
+    <script>
+        // Элементы DOM
+        const timeDisplay = document.getElementById('time');
+        const timerLabel = document.getElementById('timer-label');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const progressCircle = document.getElementById('progress');
+        const sessionCountDisplay = document.getElementById('sessionCount');
+        
+        // Элементы настроек
+        const workTimeDisplay = document.getElementById('workTime');
+        const breakTimeDisplay = document.getElementById('breakTime');
+        const workMinusBtn = document.getElementById('workMinus');
+        const workPlusBtn = document.getElementById('workPlus');
+        const breakMinusBtn = document.getElementById('breakMinus');
+        const breakPlusBtn = document.getElementById('breakPlus');
+        
+        // Переменные таймера
+        let workTime = 25 * 60; // 25 минут в секундах
+        let breakTime = 5 * 60; // 5 минут в секундах
+        let timeLeft = workTime;
+        let timerId = null;
+        let isRunning = false;
+        let isWorkTime = true;
+        let sessionCount = 0;
+        
+        // Инициализация
+        function init() {
+            updateDisplay();
+            updateProgress();
+            
+            // Загрузка данных из localStorage
+            const savedSessionCount = localStorage.getItem('pomodoroSessions');
+            if (savedSessionCount) {
+                sessionCount = parseInt(savedSessionCount);
+                sessionCountDisplay.textContent = sessionCount;
+            }
+        }
+        
+        // Обновление отображения времени
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timeDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Обновление текста состояния
+            timerLabel.textContent = isWorkTime ? 'Рабочее время' : 'Перерыв';
+            timerLabel.style.color = isWorkTime ? '#ff6b6b' : '#4ecdc4';
+            
+            // Обновление цвета кнопки старт/пауза
+            startBtn.style.backgroundColor = isWorkTime ? '#ff6b6b' : '#4ecdc4';
+        }
+        
+        // Обновление прогресс-круга
+        function updateProgress() {
+            const totalTime = isWorkTime ? workTime : breakTime;
+            const progress = 360 - (timeLeft / totalTime * 360);
+            progressCircle.style.background = `conic-gradient(${isWorkTime ? '#ff6b6b' : '#4ecdc4'} ${progress}deg, transparent ${progress}deg)`;
+        }
+        
+        // Запуск таймера
+        function startTimer() {
+            if (timerId) return;
+            
+            isRunning = true;
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            
+            timerId = setInterval(() => {
+                timeLeft--;
+                
+                updateDisplay();
+                updateProgress();
+                
+                // Когда время вышло
+                if (timeLeft === 0) {
+                    clearInterval(timerId);
+                    timerId = null;
+                    
+                    // Воспроизведение звукового сигнала
+                    playSound();
+                    
+                    // Переключение между работой и перерывом
+                    if (isWorkTime) {
+                        sessionCount++;
+                        sessionCountDisplay.textContent = sessionCount;
+                        localStorage.setItem('pomodoroSessions', sessionCount);
+                        
+                        // Каждые 4 сессии - длинный перерыв
+                        if (sessionCount % 4 === 0) {
+                            breakTime = 15 * 60; // 15 минут для длинного перерыва
+                            breakTimeDisplay.textContent = "15";
+                        }
+                        
+                        isWorkTime = false;
+                        timeLeft = breakTime;
+                        timerLabel.innerHTML = '<i class="fas fa-coffee"></i> Перерыв';
+                    } else {
+                        isWorkTime = true;
+                        timeLeft = workTime;
+                        
+                        // Возвращаем короткий перерыв, если был длинный
+                        if (breakTime === 15 * 60) {
+                            breakTime = 5 * 60;
+                            breakTimeDisplay.textContent = "5";
+                        }
+                    }
+                    
+                    // Автозапуск следующего интервала
+                    setTimeout(startTimer, 1500);
+                }
+            }, 1000);
+        }
+        
+        // Пауза таймера
+        function pauseTimer() {
+            if (!timerId) return;
+            
+            clearInterval(timerId);
+            timerId = null;
+            isRunning = false;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+        }
+        
+        // Сброс таймера
+        function resetTimer() {
+            pauseTimer();
+            isWorkTime = true;
+            timeLeft = workTime;
+            updateDisplay();
+            updateProgress();
+        }
+        
+        // Воспроизведение звукового сигнала
+        function playSound() {
+            // Создаем звуковой контекст для воспроизведения звука
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                // Если Web Audio API не поддерживается, просто выводим сообщение
+                console.log("Время вышло! " + (isWorkTime ? "Пора на перерыв!" : "Пора работать!"));
+            }
+        }
+        
+        // Управление настройками времени
+        function adjustTime(type, operation) {
+            if (isRunning) return;
+            
+            if (type === 'work') {
+                if (operation === 'plus' && workTime < 60 * 60) {
+                    workTime += 60; // Увеличиваем на 1 минуту
+                    workTimeDisplay.textContent = workTime / 60;
+                } else if (operation === 'minus' && workTime > 60) {
+                    workTime -= 60; // Уменьшаем на 1 минуту
+                    workTimeDisplay.textContent = workTime / 60;
+                }
+                
+                if (isWorkTime) {
+                    timeLeft = workTime;
+                    updateDisplay();
+                    updateProgress();
+                }
+            } else if (type === 'break') {
+                if (operation === 'plus' && breakTime < 30 * 60) {
+                    breakTime += 60; // Увеличиваем на 1 минуту
+                    breakTimeDisplay.textContent = breakTime / 60;
+                } else if (operation === 'minus' && breakTime > 60) {
+                    breakTime -= 60; // Уменьшаем на 1 минуту
+                    breakTimeDisplay.textContent = breakTime / 60;
+                }
+                
+                if (!isWorkTime) {
+                    timeLeft = breakTime;
+                    updateDisplay();
+                    updateProgress();
+                }
+            }
+        }
+        
+        // Назначение обработчиков событий
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        
+        workPlusBtn.addEventListener('click', () => adjustTime('work', 'plus'));
+        workMinusBtn.addEventListener('click', () => adjustTime('work', 'minus'));
+        breakPlusBtn.addEventListener('click', () => adjustTime('break', 'plus'));
+        breakMinusBtn.addEventListener('click', () => adjustTime('break', 'minus'));
+        
+        // Инициализация при загрузке
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
